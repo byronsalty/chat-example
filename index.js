@@ -20,7 +20,7 @@ io.on('connection', (socket) => {
   //io.emit('chat message', "User connected");
 
   socket.on('chat message', msg => {
-    io.emit('chat message', msg);
+    socket.broadcast.emit('chat message', msg);
   });
   socket.on('disconnect', () => {
     //io.emit('chat message', sysMsg("user disconnected"));

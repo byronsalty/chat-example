@@ -31,6 +31,15 @@
       var user = document.getElementById('name');
       var input = document.getElementById('input');
 
+      function addMsg(msg) {
+        if (msg && msg.user) {
+          var item = document.createElement('li');
+          item.textContent = msg.user + ": " + msg.content;
+          messages.appendChild(item);
+          window.scrollTo(0, document.body.scrollHeight);
+        }
+      }
+
       form.addEventListener('submit', function(e) {
         e.preventDefault();
         if (input.value) {
@@ -39,6 +48,7 @@
             content: input.value
           };
           socket.emit('chat message', msg);
+          addMsg(msg);
           input.value = '';
         }
       });
@@ -51,12 +61,7 @@
       });
 
       socket.on('chat message', function(msg) {
-        if (msg && msg.user) {
-          var item = document.createElement('li');
-          item.textContent = msg.user + ": " + msg.content;
-          messages.appendChild(item);
-          window.scrollTo(0, document.body.scrollHeight);
-        }
+        addMsg(msg);
       });
     </script>
   </body>
