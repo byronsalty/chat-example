@@ -31,7 +31,7 @@ io.on('connection', (socket) => {
   });
   socket.on('username', user => {
     console.log("username registered: " + user);
-    io.emit('chat message', user + " connected");
+    io.emit('chat message', sysMsg(user + " connected"));
     connectedUsers[socket.id] = user
     console.log("users: " + JSON.stringify(connectedUsers));
   });
