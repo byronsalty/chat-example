@@ -2,6 +2,7 @@ const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const port = process.env.PORT || 3000;
+const SYSTEM_USER = "system";
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
@@ -11,7 +12,7 @@ connectedUsers = {};
 
 function sysMsg(msg) {
   return {
-    user: "system",
+    user: SYSTEM_USER,
     content: msg
   }
 }
@@ -21,6 +22,10 @@ io.on('connection', (socket) => {
 
   socket.on('chat message', msg => {
     socket.broadcast.emit('chat message', msg);
+  });
+  socket.on('typing', msg => {
+    console.log(msg.user + " is typing");
+    socket.broadcast.emit('typing', msg);
   });
   socket.on('disconnect', () => {
     //io.emit('chat message', sysMsg("user disconnected"));

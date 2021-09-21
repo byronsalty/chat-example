@@ -13,6 +13,9 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages > li { padding: 0.5rem 1rem; }
       #messages > li:nth-child(odd) { background: #efefef; }
+
+      #messages > li.text { color: #000; }
+      #messages > li.typing { color: #999; }
     </style>
   </head>
   <body>
@@ -30,13 +33,21 @@
       var form = document.getElementById('form');
       var user = document.getElementById('name');
       var input = document.getElementById('input');
+      var typing = false;
 
-      function addMsg(msg) {
+      function addMsg(msg, liClass="text") {
         if (msg && msg.user) {
           var item = document.createElement('li');
+          item.className = liClass;
           item.textContent = msg.user + ": " + msg.content;
           messages.appendChild(item);
           window.scrollTo(0, document.body.scrollHeight);
+
+          if (liClass === "typing") {
+            setTimeout(function() {
+              messages.removeChild(item);
+            }, 5000);
+          }
         }
       }
 
@@ -50,6 +61,19 @@
           socket.emit('chat message', msg);
           addMsg(msg);
           input.value = '';
+          typing = false;
+        }
+      });
+
+      input.addEventListener('keyup', function(e) {
+        e.preventDefault();
+        if (input.value && !typing) {
+          msg = {
+            user: user.value,
+            typing: true
+          };
+          typing = true;
+          socket.emit('typing', msg);
         }
       });
 
@@ -61,7 +85,15 @@
       });
 
       socket.on('chat message', function(msg) {
+        console.log("chat");
         addMsg(msg);
+      });
+      socket.on('typing', function(msg) {
+        console.log("typing");
+        msg.content = msg.user + " is typing";
+        msg.user = "system";
+        //console.log("Typing: " + JSON.stringify(msg));
+        addMsg(msg, "typing");
       });
     </script>
   </body>
